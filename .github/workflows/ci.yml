@@ -30,8 +30,14 @@ jobs:
       - name: Cargo Fmt Check
         run: cargo fmt --all -- --check
 
-      - name: Cargo Build
-        run: cargo build
+      # Runs before any database is set up and with no DATABASE_URL, so it
+      # proves downstream crates can build the adapter offline for every driver.
+      - name: Cargo Build (offline, no database)
+        run: |
+          cargo build
+          cargo build --no-default-features --features postgres,runtime-tokio-native-tls
+          cargo build --no-default-features --features mysql,runtime-tokio-native-tls
+          cargo build --no-default-features --features sqlite,runtime-tokio-native-tls
 
       - name: Setup PostgreSQL & MySQL & SQLite (for ubuntu)
         if: matrix.os == 'ubuntu-latest'

@@ -51,9 +51,11 @@ tokio = { version = "1.1.1", features = ["macros"] }
 
 ## Configure
 
+**No database is needed to build this crate.** All queries are executed at runtime, so `cargo build` works offline and you never have to set `DATABASE_URL` or run `cargo sqlx prepare` in your own project. The steps below are only about the database your application talks to at runtime (and about running this repository's own test suite).
+
 1. Set up database environment
    
-    You must prepare the database environment so that `Sqlx` can do static check with queries during compile time. One convenient option is using docker to get your database environment ready:
+    One convenient option is using docker to get your database environment ready:
     
     ```bash
     #!/bin/bash
@@ -109,6 +111,8 @@ tokio = { version = "1.1.1", features = ["macros"] }
 
 2. Create table `casbin_rule`
 
+    `SqlxAdapter` issues `CREATE TABLE IF NOT EXISTS` on startup, so this is optional — do it yourself only if your database user is not allowed to create tables.
+
     ```bash
     # PostgreSQL
     psql postgres://casbin_rs:casbin_rs@127.0.0.1:5432/casbin -c "CREATE TABLE IF NOT EXISTS casbin_rule (
@@ -155,7 +159,7 @@ tokio = { version = "1.1.1", features = ["macros"] }
        );"
     ```
 
-3. Configure `env`
+3. Configure `env` (only needed to run this repository's tests)
 
     Rename `sample.env` to `.env` and put `DATABASE_URL`, `POOL_SIZE`   inside
 
